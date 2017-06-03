@@ -5,6 +5,8 @@
 
 import math
 import random
+import matplotlib.pyplot as plt
+
 
 # === Provided classes
 
@@ -21,7 +23,7 @@ class Position(object):
         """
         self.x = x
         self.y = y
-        print x,y
+        #print x,y
     def getX(self):
         return self.x
     def getY(self):
@@ -43,10 +45,13 @@ class Position(object):
         # Compute the change in position
         delta_y = speed * math.cos(math.radians(angle))
         delta_x = speed * math.sin(math.radians(angle))
+
         # Add that to the existing position
         new_x = old_x + delta_x
         new_y = old_y + delta_y
+
         return Position(new_x, new_y)
+
 
 
 # === Problems 1 and 2
@@ -141,11 +146,13 @@ class RectangularRoom(object):
         posX = pos.getX()
         posY = pos.getY()
 
-        if self.width < posX: return False
-        if self.height < posY: return False
+        if self.width > posX and self.height > posY:
+            return True 
+        else: 
+            return False 
+        
 
 
-        return True
 
 
 class BaseRobot(object):
@@ -177,7 +184,7 @@ class BaseRobot(object):
         self.roomObj = room
         self.speed = speed
 
-        self.dirAngle = random.randint(0,360)
+        self.dirAngle = 0
         self.p = self.roomObj.getRandomPosition()
 
 
@@ -199,6 +206,8 @@ class BaseRobot(object):
         degrees, 0 <= d < 360.
         """
         # TODO: Your code goes here
+        self.dirAngle = random.randint(0,360)
+
         return self.dirAngle
     def setRobotPosition(self, position):
         """
@@ -243,16 +252,18 @@ class Robot(BaseRobot):
         speed = self.speed
         position = self.getRobotPosition()
         angle = self.getRobotDirection()
+
         newPosition = position.getNewPosition(angle, speed)
 
-
-        while not roomObj.isPositionInRoom(newPosition):
-            newPosition = position.getNewPosition(angle, speed)
-
+        
+        while roomObj.isPositionInRoom(newPosition) == False:
+            newAngle = self.getRobotDirection()
+            print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",newAngle
+            newPosition = position.getNewPosition(newAngle, speed)
+        
 
         self.setRobotPosition(newPosition)
         roomObj.cleanTileAtPosition(newPosition)
-        print "clean"
 
 
         
@@ -290,8 +301,8 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
     robot = Robot(room,speed)
 
     for num in range(num_trials):
-        t=0
         justList = []
+        min_coverage = min_coverage / num_robots
 
         while coverage < min_coverage:
 
@@ -299,10 +310,9 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
             total = float(room.getNumTiles())
             clean = float(room.getNumCleanedTiles())
             coverage = clean / total
-            print coverage
             justList.append(coverage)
-            t+=1
         list_of_lists.append(justList)
+        return list_of_lists
 
 
 
@@ -392,8 +402,32 @@ def showPlot5():
 
 
 
-rm = RectangularRoom(5,6)
-robot = BaseRobot(rm,1)
-posR = robot.getRobotPosition()
+def runAvg(width,height, num_robots):
+    avg = runSimulation(num_robots, 1.0, width, height, 0.75, 30, Robot, False) 
+    return len(avg[0])
 
-avg = runSimulation(10, 1.0, 15, 20, 0.8, 30, Robot, False) 
+listAvg = []
+for num in range(1,10):
+    avg = runAvg(25,25,num)
+    listAvg.append(avg)
+
+plt.plot(listAvg, 'ro')
+plt.xlabel('robots')
+plt.ylabel('average time')
+plt.show()
+
+
+"""
+print runAvg(5,5,1)
+print runAvg(10,10,1)
+print runAvg(20,20,1)
+print runAvg(25,25,1)
+
+plt.plot([5^2, 10^2, 20^2, 25^2],[ runAvg(5,5,1),
+ runAvg(10,10,1),
+ runAvg(20,20,1),
+ runAvg(25,25,1)], 'ro')
+plt.xlabel('room area')
+plt.ylabel('average time')
+plt.show()
+"""
