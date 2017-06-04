@@ -448,17 +448,21 @@ def problem4():
     resist =  {'guttagonol':False} 
     mutProb = .005
     resVir = ResistantVirus(maxProb,clearProb,resist, mutProb)
-    simVir = SimpleVirus(maxProb,clearProb)
+    resVir1 = ResistantVirus(maxProb,clearProb,{}, mutProb)
     virList = 100 * [resVir]
+    virList1 = 100 * [resVir1]
     newPat = Patient(virList, 1000)
-    secPat = SimplePatient(virList, 1000)
+    newPat1 = Patient(virList1, 1000)
+
 
     newPopListList = []
     finalList = []
     for x in range(150):     
+        newPopList = newPat1.update()
+        newPopListList.append(newPopList)
+    for x in range(150):     
         newPopList = newPat.update()
         newPopListList.append(newPopList)
-
 
 
     plt.plot(newPopListList, 'ro')
