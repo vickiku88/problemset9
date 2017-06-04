@@ -296,8 +296,7 @@ class ResistantVirus(SimpleVirus):
         for drug in activeDrugs:
             if not self.getResistance(drug): 
                 willReproduce = False
-                print "false"
-                break
+                return NoChildException()
 
         if willReproduce:  
             probOfRepro = self.maxBirthProb * (1 - popDensity)
@@ -445,31 +444,29 @@ def problem4():
     # TODO
     clearProb = 0.05
     maxProb = 0.1
-    resist =  {'guttagonol':False} 
+    #resist =  {'guttagonol':False} 
+    resist = {'guttagonal': False}
     mutProb = .005
     resVir = ResistantVirus(maxProb,clearProb,resist, mutProb)
-    resVir1 = ResistantVirus(maxProb,clearProb,{}, mutProb)
     virList = 100 * [resVir]
-    virList1 = 100 * [resVir1]
     newPat = Patient(virList, 1000)
-    newPat1 = Patient(virList1, 1000)
+
 
 
     newPopListList = []
-    finalList = []
-    for x in range(150):     
-        newPopList = newPat1.update()
-        newPopListList.append(newPopList)
-    for x in range(150):     
-        newPopList = newPat.update()
-        newPopListList.append(newPopList)
+    for t in range(300): 
+        if t == 150:
+            newPat.drugsList.append('guttagonal')
+        newPop = newPat.update()
+        newPopListList.append(newPop)
 
 
+    #print newPopListList
     plt.plot(newPopListList, 'ro')
     plt.ylabel('viruspop')
     plt.xlabel('time')
     plt.show()
-print problem4()
+#print problem4()
 #
 # PROBLEM 5
 #
@@ -503,6 +500,38 @@ def problem6():
     timesteps of simulation).
     """
     # TODO
+    maxProb = 0.1
+    clearProb = 0.05
+    resist = {'guttagonol':False, 'grimpex':False} 
+    mutProb = .005
+
+    resVir = ResistantVirus(maxProb,clearProb,resist, mutProb)
+    virList = 100 * [resVir]
+    newPat = Patient(virList, 1000)
+
+    basePopList =[]
+    #timeSteps = 150+300+150
+    #timeSteps = 150+150+150
+    timeSteps = 150+75+150
+    for t in range(timeSteps):
+        if t == 150:
+            newPat.drugsList.append('guttagonol')
+        #if t == 150:
+            newPat.drugsList.append('grimpex')
+
+        basePop = newPat.update()
+        basePopList.append(basePop)
+
+            
+
+    graphPop = basePopList
+    plt.plot(graphPop, 'ro')
+    plt.ylabel('viruspop')
+    plt.xlabel('time')
+    plt.show()
+print problem6()
+
+
 
 #
 # PROBLEM 7
